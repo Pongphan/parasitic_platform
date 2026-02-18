@@ -13,27 +13,28 @@ st.markdown(
     """
 <style>
 :root{
-  --bg0:#070A12;
-  --bg1:#0A1020;
-  --card:#0B1326;
-  --card2:#0C1730;
-  --txt:#EAF1FF;
-  --muted:rgba(234,241,255,.72);
-  --muted2:rgba(234,241,255,.55);
-  --stroke:rgba(234,241,255,.10);
-  --stroke2:rgba(234,241,255,.16);
-  --glow1:rgba(110,231,255,.20);
-  --glow2:rgba(166,255,203,.18);
+  --bg0:#0F172A;
+  --bg1:#0F172A;
+  --card:#1E293B;
+  --card2:#334155;
+  --txt:#ffffff;
+  --muted:#CBD5E1;
+  --muted2:#94A3B8;
+  --stroke:rgba(255,255,255,.2);
+  --stroke2:rgba(255,255,255,.12);
+  --glow1:rgba(56,189,248,.08);
+  --glow2:rgba(34,211,238,.06);
 }
 
 .stApp {
   background:
-    radial-gradient(1200px 600px at 20% 10%, rgba(110,231,255,.08), transparent 55%),
-    radial-gradient(900px 500px at 85% 15%, rgba(166,255,203,.06), transparent 55%),
-    radial-gradient(800px 600px at 30% 85%, rgba(173,110,255,.05), transparent 60%),
+    radial-gradient(1200px 600px at 20% 10%, rgba(110,231,255,.2), transparent 60%),
+    radial-gradient(900px 500px at 85% 15%, rgba(57, 62, 155, 0.2), transparent 80%),
+    radial-gradient(800px 600px at 30% 85%, rgba(26, 82, 187, 0.2), transparent 60%),
     linear-gradient(180deg, var(--bg0), var(--bg1));
   color: var(--txt);
 }
+
 
 /* Layout tuning */
 .block-container { padding-top: 1.0rem !important; padding-bottom: 2.1rem !important; max-width: 1200px; }
@@ -48,8 +49,9 @@ header { visibility: hidden; }
   border: 1px solid var(--stroke);
   border-radius: 22px;
   padding: 22px 22px 18px 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  background: linear-gradient(180deg, rgba(73, 190, 249, 0.02), rgba(73, 190, 249, 0.02));
   box-shadow: 0 10px 36px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
 }
@@ -59,13 +61,13 @@ header { visibility: hidden; }
   inset:-2px;
   background:
     radial-gradient(700px 220px at 20% 0%, rgba(110,231,255,.20), transparent 55%),
-    radial-gradient(600px 240px at 80% 0%, rgba(166,255,203,.16), transparent 55%);
+    radial-gradient(600px 240px at 80% 0%, rgba(57, 62, 155, 0.126), transparent 55%);
   filter: blur(16px);
   opacity:.55;
   pointer-events:none;
 }
 .hero h1{
-  font-size: 2.15rem;
+  font-size: 2.75rem;
   line-height: 1.12;
   margin: 0;
   font-weight: 800;
@@ -77,16 +79,6 @@ header { visibility: hidden; }
   font-size: 1.02rem;
 }
 
-/* Utility panel */
-.util {
-  margin-top: 14px;
-  border: 1px solid var(--stroke);
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,.02);
-  box-shadow: 0 10px 26px rgba(0,0,0,.25);
-}
-
 /* Section label */
 .section-label{
   margin-top: 1.15rem;
@@ -95,6 +87,39 @@ header { visibility: hidden; }
   font-size: .92rem;
   letter-spacing: .14em;
   text-transform: uppercase;
+}
+
+[data-testid="stMetricLabel"] p, .section-label, .small-muted {
+    color: #E2E8F0 !important; 
+}
+
+[data-testid="stMetricValue"] div, .card-title, .hero h1 {
+    color: #FFFFFF !important;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.3); /* เพิ่มเงาหลังตัวอักษรให้ดูคมขึ้น */
+}
+
+[data-testid="stPageLink-NavLink"] p {
+    color: #FFFFFF !important; /* บังคับให้เป็นสีขาวสว่าง */
+    font-weight: 600 !important; /* เพิ่มความหนาของตัวอักษร */
+    font-size: 1rem !important;  /* ปรับขนาดให้พอดี */
+}
+
+
+[data-testid="stPageLink-NavLink"] {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--stroke2) !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease;
+}
+
+[data-testid="stPageLink-NavLink"]:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: #58C4FF !important; 
+}
+
+.pill {
+    color: #FFFFFF !important;
+    background: rgba(255,255,255,0.15) !important;
 }
 
 /* Card grid */
@@ -115,8 +140,8 @@ header { visibility: hidden; }
   border-radius: 20px;
   border: 1px solid var(--stroke);
   background:
-    radial-gradient(900px 240px at 10% 0%, rgba(110,231,255,.08), transparent 55%),
-    radial-gradient(700px 220px at 90% 0%, rgba(166,255,203,.06), transparent 55%),
+    radial-gradient(900px 240px at 10% 20%, rgba(110,231,255,.25), transparent 55%),
+    radial-gradient(700px 220px at 90% 0%, rgba(166,255,203,.20), transparent 55%),
     linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   padding: 16px 16px 14px 16px;
@@ -182,13 +207,54 @@ header { visibility: hidden; }
   gap: 8px;
 }
 .pill{
+  color: #FFFFFF !important;
   font-size: .78rem;
   color: rgba(234,241,255,.82);
-  border: 1px solid var(--stroke);
-  background: rgba(255,255,255,.03);
+  border: 1px solid var(--stroke2) !important;
+  background: rgba(255,255,255,.08);
   padding: 6px 10px;
   border-radius: 999px;
   letter-spacing: .2px;
+}
+
+[data-testid="stMetricLabel"] p {
+    color: var(--muted) !important; /* ใช้สีเทาสว่างที่เราตั้งไว้ */
+    font-size: 0.95rem !important;
+}
+[data-testid="stMetricValue"] {
+    color: #FFFFFF !important; /* บังคับให้ตัวเลขเป็นสีขาวบริสุทธิ์ */
+    font-weight: 700 !important;
+}
+
+[data-testid="stCheckbox"] label p {
+    color: #FFFFFF !important; /* บังคับให้ข้อความข้าง Checkbox เป็นสีขาว */
+    font-weight: 500 !important;
+}
+
+
+.st-emotion-cache-16idsys p, .st-emotion-cache-zq5wms {
+    color: var(--muted) !important;
+}
+
+
+.section-label {
+    color: #58C4FF !important; /* ใช้สีฟ้าสว่างนำสายตา */
+    font-weight: 700 !important;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.5);
+}
+
+div.stButton > button {
+    color: #FF3131 !important;     /* สีตัวอักษรแดงสว่าง */
+    background-color: rgba(255, 49, 49, 0.1) !important; /* พื้นหลังแดงจางๆ */
+    border: 1px solid #FF3131 !important; /* ขอบแดง */
+    font-weight: 700 !important;   /* ตัวหนา */
+    border-radius: 12px !important;
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ไปชี้ (Hover) */
+div.stButton > button:hover {
+    background-color: #FF3131 !important; /* พื้นหลังแดงเข้ม */
+    color: white !important;               /* ตัวอักษรเปลี่ยนเป็นสีขาว */
 }
 
 /* Mini panels */
@@ -256,7 +322,7 @@ def nav_card(route: str, icon: str, title: str, desc: str, pills: list[str]) -> 
     pills_html = "".join([f'<span class="pill">{p}</span>' for p in pills])
     # Same-tab navigation: use href without target=_blank (Streamlit will route)
     return f"""
-<a class="card-link" href="{route}">
+<a class="card-link" href="/{route}" target="_self">
   <div class="card">
     <div class="card-top">
       <div>
@@ -269,6 +335,7 @@ def nav_card(route: str, icon: str, title: str, desc: str, pills: list[str]) -> 
   </div>
 </a>
 """
+
 
 # -------------------- Hero --------------------
 st.markdown(
