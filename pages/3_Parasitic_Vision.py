@@ -148,7 +148,7 @@ if isinstance(state, dict) and state.get("action") == "calculate":
     # Load model
     try:
         #model = load_model_cached("D:\P Works\Project Python\py\parasitic_platform\pages_components\img_classified_transf_paca.keras")
-        model = load_model_cached("pages_components\img_classified_transf_paca.keras")
+        model = load_model_cached("\pages_components\img_classified_transf_paca.keras")
 
     except Exception as e:
         st.exception(e)
