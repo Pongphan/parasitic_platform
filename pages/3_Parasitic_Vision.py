@@ -14,7 +14,7 @@ from viewer_component import viewer_component
 # Page config
 # =========================
 st.set_page_config(
-    page_title="Parasitic Vision",
+    page_title="Image Classification",
     page_icon=":brain:",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -93,93 +93,28 @@ header { visibility: hidden; }
   text-transform: uppercase;
 }
 
-.panel {
-  border: 1px solid var(--stroke);
-  border-radius: 18px;
-  padding: 14px 14px 10px 14px;
-  background: rgba(255,255,255,.02);
-  box-shadow: 0 10px 26px rgba(0,0,0,.25);
-}
-.panel h3{
-  margin: 0 0 10px 0;
-  font-size: 1.06rem;
-  font-weight: 780;
-}
-
-.small-muted{ color: var(--muted2); font-size: .9rem; }
-
-.kpi {
-  border: 1px solid var(--stroke);
-  border-radius: 18px;
-  padding: 12px 14px;
-  background: rgba(255,255,255,.02);
-  box-shadow: 0 10px 26px rgba(0,0,0,.25);
-}
-
-.note {
-  border-left: 3px solid rgba(110,231,255,.45);
-  padding: 10px 12px;
-  background: rgba(255,255,255,.02);
-  border-radius: 14px;
-  color: rgba(234,241,255,.82);
-}
-
 .warn {
   border-left: 3px solid rgba(255,170,80,.55);
   padding: 10px 12px;
   background: rgba(255,255,255,.02);
   border-radius: 14px;
   color: rgba(234,241,255,.82);
+  margin-top: .5rem;
 }
 
-.table-wrap {
-  border: 1px solid rgba(234,241,255,.10);
-  border-radius: 16px;
-  padding: 10px 10px;
+.info-box {
+  border-left: 3px solid rgba(110,231,255,.45);
+  padding: 10px 12px;
   background: rgba(255,255,255,.02);
+  border-radius: 14px;
+  color: rgba(234,241,255,.82);
+  margin-top: .5rem;
 }
 
-/* Metric text */
-[data-testid="stMetricLabel"] p {
-    color: #CBD5E1 !important;
-    font-size: 1rem !important;
-}
-[data-testid="stMetricValue"] div {
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-}
-
-/* Sidebar text */
-[data-testid="stCheckbox"] label p {
-    color: #94A3B8 !important;
-    font-weight: 500 !important;
-}
-[data-testid="stSidebar"] h1,
-[data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3,
-div[data-testid="stVerticalBlock"] > div > div > div > span {
-    color: #1E293B !important;
-    font-weight: 850 !important;
-    font-size: 1.25rem !important;
-    opacity: 1 !important;
-}
-[data-testid="stSidebarNav"] span {
-    color: #0F172A !important;
-    font-weight: 500 !important;
-}
-[data-testid="stSidebar"] p {
-    color: #0F172A !important;
-    font-weight: 600 !important;
-}
-[data-testid="stSidebar"] {
-    background-color: #E2E8F0 !important;
-}
-span, p, small, .small-muted {
+span, p, small {
     color: #F8FAFC !important;
     opacity: 1 !important;
-    font-weight: 500 !important;
 }
-.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -212,6 +147,9 @@ DEFAULT_INPUT_SIZE: Tuple[int, int] = (128, 128)
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parent.parent
 MODELS_DIR = PROJECT_ROOT / "pages_components"
+DATASET_DIR = PROJECT_ROOT / "pages_dataset"
+
+ALLOWED_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".webp"}
 
 
 # =========================
@@ -234,10 +172,6 @@ def compute_center_cell_crop_box(
     pan_x: float,
     pan_y: float,
 ) -> Tuple[int, int, int, int]:
-    """
-    Convert viewer state (viewport + zoom + pan) to crop box on original image,
-    using the center cell of a 3x3 grid in the viewer.
-    """
     w0, h0 = img.size
     vp = float(max(1, viewport))
     z = float(max(1e-6, zoom))
@@ -279,32 +213,21 @@ def compute_center_cell_crop_box(
     y1 = max(0, min(y1, h0 - 1))
     x2 = max(x1 + 1, min(x2, w0))
     y2 = max(y1 + 1, min(y2, h0))
-
     return (x1, y1, x2, y2)
 
 
 def discover_models(models_dir: Path) -> List[Path]:
-    """
-    Discover loadable TensorFlow/Keras models in pages_components:
-    - *.keras
-    - *.h5 / *.hdf5
-    - SavedModel directories (containing saved_model.pb)
-    """
     if not models_dir.exists():
         return []
 
     found: List[Path] = []
-
-    # File-based Keras models
     for ext in ("*.keras", "*.h5", "*.hdf5"):
         found.extend(sorted(models_dir.glob(ext)))
 
-    # SavedModel folders
     for p in sorted(models_dir.iterdir()):
         if p.is_dir() and (p / "saved_model.pb").exists():
             found.append(p)
 
-    # Deduplicate while preserving order
     dedup: List[Path] = []
     seen = set()
     for p in found:
@@ -315,11 +238,31 @@ def discover_models(models_dir: Path) -> List[Path]:
     return dedup
 
 
+def discover_dataset_images(dataset_dir: Path) -> List[Path]:
+    """
+    Discover images recursively under pages_dataset/.
+    """
+    if not dataset_dir.exists():
+        return []
+
+    images: List[Path] = []
+    for p in sorted(dataset_dir.rglob("*")):
+        if p.is_file() and p.suffix.lower() in ALLOWED_IMAGE_EXTS:
+            images.append(p.resolve())
+    return images
+
+
 def path_display_name(p: Path) -> str:
-    """Friendly name for UI."""
     if p.is_dir():
         return f"{p.name}  [SavedModel]"
     return p.name
+
+
+def relpath_or_name(p: Path, root: Path) -> str:
+    try:
+        return str(p.relative_to(root))
+    except Exception:
+        return p.name
 
 
 @st.cache_resource(show_spinner=False)
@@ -331,12 +274,8 @@ def get_model_input_size(
     model: tf.keras.Model,
     fallback: Tuple[int, int] = DEFAULT_INPUT_SIZE
 ) -> Tuple[int, int]:
-    """
-    Try to infer model input size from Keras model.input_shape.
-    Returns (width, height).
-    """
     try:
-        shape = model.input_shape  # e.g. (None, 128, 128, 3)
+        shape = model.input_shape
         if isinstance(shape, list) and len(shape) > 0:
             shape = shape[0]
         if shape is None or len(shape) < 4:
@@ -363,15 +302,11 @@ def prepare_input_tensor(
     if normalize_to_01:
         arr = arr / 255.0
 
-    x = np.expand_dims(arr, axis=0)  # (1, H, W, 3)
+    x = np.expand_dims(arr, axis=0)
     return x
 
 
 def postprocess_prediction(y_pred_raw: np.ndarray, labels: List[str]) -> Dict[str, Any]:
-    """
-    Convert model output to unified dict.
-    Handles multiclass vector, binary sigmoid scalar, and odd shapes.
-    """
     y = np.asarray(y_pred_raw)
 
     if y.ndim == 0:
@@ -379,7 +314,7 @@ def postprocess_prediction(y_pred_raw: np.ndarray, labels: List[str]) -> Dict[st
     elif y.ndim >= 2 and y.shape[0] == 1:
         y = y[0]
 
-    # Binary scalar
+    # binary scalar
     if y.ndim == 0 or (y.ndim == 1 and y.shape[0] == 1):
         score = float(np.ravel(y)[0])
         score_clamped = float(max(0.0, min(1.0, score)))
@@ -392,25 +327,22 @@ def postprocess_prediction(y_pred_raw: np.ndarray, labels: List[str]) -> Dict[st
             pred_index = 0
             used_labels = labels[:1] if labels else ["class_0"]
 
-        pred_label = used_labels[pred_index] if pred_index < len(used_labels) else f"class_{pred_index}"
         return {
             "pred_index": pred_index,
-            "pred_label": pred_label,
+            "pred_label": used_labels[pred_index] if pred_index < len(used_labels) else f"class_{pred_index}",
             "scores": scores,
             "display_pairs": list(zip(used_labels, scores)),
             "num_classes": len(scores),
         }
 
-    # Multiclass vector
+    # multiclass vector
     if y.ndim == 1:
         scores = [float(v) for v in y.tolist()]
         pred_index = int(np.argmax(y))
-
         if len(labels) < len(scores):
             used_labels = labels + [f"class_{i}" for i in range(len(labels), len(scores))]
         else:
             used_labels = labels[:len(scores)]
-
         return {
             "pred_index": pred_index,
             "pred_label": used_labels[pred_index],
@@ -419,7 +351,7 @@ def postprocess_prediction(y_pred_raw: np.ndarray, labels: List[str]) -> Dict[st
             "num_classes": len(scores),
         }
 
-    # Fallback
+    # fallback
     flat = y.flatten()
     scores = [float(v) for v in flat.tolist()]
     pred_index = int(np.argmax(flat))
@@ -447,13 +379,6 @@ def softmax_numpy(logits: np.ndarray) -> np.ndarray:
 
 
 def normalize_scores_for_ensemble(scores: List[float]) -> Optional[np.ndarray]:
-    """
-    Convert per-model scores to a comparable probability-like vector for ensemble averaging.
-    - If all scores in [0,1] and sum ~ 1 => use as-is
-    - If all scores in [0,1] but sum != 1 => normalize by sum (if sum>0)
-    - Else => apply softmax (treat as logits)
-    Returns None if invalid.
-    """
     if scores is None or len(scores) == 0:
         return None
     x = np.asarray(scores, dtype=np.float64)
@@ -467,16 +392,10 @@ def normalize_scores_for_ensemble(scores: List[float]) -> Optional[np.ndarray]:
         return x
     if in01 and s > 0:
         return x / s
-
-    # logits-like
     return softmax_numpy(x)
 
 
 def build_ensemble_summary(per_model_results: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    """
-    Ensemble only if all selected models share same num_classes.
-    Uses average normalized scores + majority vote.
-    """
     if not per_model_results:
         return None
 
@@ -502,14 +421,10 @@ def build_ensemble_summary(per_model_results: List[Dict[str, Any]]) -> Optional[
         if labels_ref is None:
             labels_ref = [lbl for lbl, _ in pred_info["display_pairs"]]
 
-    if not prob_vectors or labels_ref is None:
-        return None
-
     avg_scores = np.mean(np.vstack(prob_vectors), axis=0)
     pred_index = int(np.argmax(avg_scores))
     pred_label = labels_ref[pred_index] if pred_index < len(labels_ref) else f"class_{pred_index}"
 
-    # majority vote
     vote_counts = {i: votes.count(i) for i in sorted(set(votes))}
     maj_index = max(vote_counts.items(), key=lambda kv: kv[1])[0]
     maj_label = labels_ref[maj_index] if maj_index < len(labels_ref) else f"class_{maj_index}"
@@ -523,6 +438,16 @@ def build_ensemble_summary(per_model_results: List[Dict[str, Any]]) -> Optional[
         "vote_counts": vote_counts,
         "labels": labels_ref,
     }
+
+
+@st.cache_data(show_spinner=False)
+def read_image_bytes(file_path_str: str) -> bytes:
+    p = Path(file_path_str)
+    return p.read_bytes()
+
+
+def load_pil_image_from_bytes(image_bytes: bytes) -> Image.Image:
+    return Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
 
 # -------------------- Quick Links --------------------
@@ -545,12 +470,11 @@ st.markdown('<div class="section-label">Inference controls</div>', unsafe_allow_
 available_model_paths = discover_models(MODELS_DIR)
 model_name_to_path: Dict[str, Path] = {path_display_name(p): p for p in available_model_paths}
 model_names = list(model_name_to_path.keys())
-
 default_selection = model_names[:1] if model_names else []
 
 cA, cB = st.columns([1.4, 1.0], gap="medium")
 with cA:
-    viewport = st.slider("Viewport size (px)", 360, 900, 400, 20)
+    viewport = st.slider("Viewport size (px)", 360, 900, 360, 20)
 with cB:
     normalize_to_01 = st.checkbox("Normalize input (/255)", value=False)
 
@@ -572,11 +496,6 @@ if not selected_model_names:
 
 selected_model_paths = [model_name_to_path[name] for name in selected_model_names]
 
-st.caption(
-    "Tip: Zoom/pan to place the target object inside the center box, then click **Calculate**. "
-    "The app will run all selected models on the same ROI."
-)
-
 # =========================
 # Session state
 # =========================
@@ -587,7 +506,6 @@ if "viewer" not in st.session_state:
         "panY": 0.0,
         "viewport": int(viewport),
     }
-
 st.session_state.viewer["viewport"] = int(viewport)
 
 if "last_processed_calc_token" not in st.session_state:
@@ -596,27 +514,122 @@ if "last_processed_calc_token" not in st.session_state:
 if "pv_last_result" not in st.session_state:
     st.session_state.pv_last_result = None
 
+# dataset selection state
+if "pv_selected_dataset_image_path" not in st.session_state:
+    st.session_state.pv_selected_dataset_image_path = None
+
+if "pv_selected_dataset_image_name" not in st.session_state:
+    st.session_state.pv_selected_dataset_image_name = None
+
+if "pv_image_source_mode" not in st.session_state:
+    # "upload" or "dataset"
+    st.session_state.pv_image_source_mode = "upload"
+
 # =========================
-# Upload image
+# Dataset gallery (NEW)
 # =========================
-img_file = st.file_uploader(
+st.markdown('<div class="section-label">Image source</div>', unsafe_allow_html=True)
+
+uploaded_file = st.file_uploader(
     "Upload original image",
-    type=["png", "jpg", "jpeg", "tif", "tiff", "bmp"],
+    type=["png", "jpg", "jpeg", "tif", "tiff", "bmp", "webp"],
+    key="pv_uploader",
 )
 
-if not img_file:
-    st.info("Upload an image to start.")
+dataset_images = discover_dataset_images(DATASET_DIR)
+
+with st.expander("📂 Dataset gallery (pages_dataset) — click a button under an image to use it", expanded=False):
+    if not DATASET_DIR.exists():
+        st.warning(f"Folder not found: {DATASET_DIR}")
+        st.markdown(
+            "<div class='info-box'>Create folder <code>pages_dataset/</code> at project root and put sample images inside.</div>",
+            unsafe_allow_html=True,
+        )
+    elif not dataset_images:
+        st.info(f"No images found in {DATASET_DIR}")
+    else:
+        st.caption(f"Found {len(dataset_images)} image(s) in pages_dataset/")
+        
+        # Display thumbnails in a grid
+        n_cols = 4
+        for i in range(0, len(dataset_images), n_cols):
+            row_paths = dataset_images[i:i + n_cols]
+            cols = st.columns(n_cols, gap="medium")
+            for col, img_path in zip(cols, row_paths):
+                with col:
+                    try:
+                        img_bytes_preview = read_image_bytes(str(img_path))
+                        preview_img = load_pil_image_from_bytes(img_bytes_preview)
+                        st.image(preview_img, use_container_width=True, caption=relpath_or_name(img_path, DATASET_DIR))
+                    except Exception as e:
+                        st.error(f"Preview failed: {img_path.name}")
+                        st.caption(str(e))
+                        continue
+
+                    btn_key = f"use_dataset_img_{i}_{img_path.name}"
+                    if st.button("Use this image", key=btn_key, use_container_width=True):
+                        st.session_state.pv_selected_dataset_image_path = str(img_path)
+                        st.session_state.pv_selected_dataset_image_name = relpath_or_name(img_path, DATASET_DIR)
+                        st.session_state.pv_image_source_mode = "dataset"
+                        st.success(f"Selected dataset image: {st.session_state.pv_selected_dataset_image_name}")
+
+# If user uploads a file, prioritize upload source in this run
+if uploaded_file is not None:
+    st.session_state.pv_image_source_mode = "upload"
+
+# =========================
+# Resolve active image source (upload OR dataset)
+# =========================
+original_img: Optional[Image.Image] = None
+source_label = ""
+
+if st.session_state.pv_image_source_mode == "upload" and uploaded_file is not None:
+    try:
+        original_img = Image.open(uploaded_file).convert("RGB")
+        source_label = f"Upload: {uploaded_file.name}"
+    except UnidentifiedImageError:
+        st.error("Unable to read the uploaded image. Please upload a valid image file.")
+        st.stop()
+    except Exception as e:
+        st.error("Unexpected error while opening uploaded image.")
+        st.exception(e)
+        st.stop()
+
+elif st.session_state.pv_image_source_mode == "dataset" and st.session_state.pv_selected_dataset_image_path:
+    try:
+        ds_bytes = read_image_bytes(st.session_state.pv_selected_dataset_image_path)
+        original_img = load_pil_image_from_bytes(ds_bytes)
+        source_label = f"Dataset: {st.session_state.pv_selected_dataset_image_name or Path(st.session_state.pv_selected_dataset_image_path).name}"
+    except FileNotFoundError:
+        st.error("Selected dataset image no longer exists.")
+        st.session_state.pv_selected_dataset_image_path = None
+        st.session_state.pv_selected_dataset_image_name = None
+        st.stop()
+    except Exception as e:
+        st.error("Unexpected error while opening dataset image.")
+        st.exception(e)
+        st.stop()
+
+# Fallback behavior: if no active image yet but dataset selected exists, use dataset
+if original_img is None and st.session_state.pv_selected_dataset_image_path:
+    try:
+        ds_bytes = read_image_bytes(st.session_state.pv_selected_dataset_image_path)
+        original_img = load_pil_image_from_bytes(ds_bytes)
+        st.session_state.pv_image_source_mode = "dataset"
+        source_label = f"Dataset: {st.session_state.pv_selected_dataset_image_name or Path(st.session_state.pv_selected_dataset_image_path).name}"
+    except Exception:
+        pass
+
+if original_img is None:
+    st.info("Upload an image or choose one from Dataset gallery.")
     st.stop()
 
-try:
-    original_img = Image.open(img_file).convert("RGB")
-except UnidentifiedImageError:
-    st.error("Unable to read the uploaded image. Please upload a valid PNG/JPG/TIFF/BMP file.")
-    st.stop()
-except Exception as e:
-    st.error("Unexpected error while opening image.")
-    st.exception(e)
-    st.stop()
+st.caption(f"Current image source → {source_label}")
+
+st.caption(
+    "Tip: Zoom/pan to place the target object inside the center box, then click **Calculate**. "
+    "The app will run all selected models on the same ROI."
+)
 
 img_b64 = pil_to_b64(original_img, fmt="PNG")
 
@@ -722,6 +735,7 @@ if do_calc:
         "load_errors": load_errors,
         "infer_errors": infer_errors,
         "normalize_to_01": normalize_to_01,
+        "image_source_label": source_label,
     }
 
 # =========================
@@ -737,6 +751,7 @@ if result is not None:
         st.subheader("Region of Interest")
         st.image(result["crop"], use_container_width=True)
         st.caption(
+            f"source={result.get('image_source_label','-')} | "
             f"token={result['calc_token']} | "
             f"zoom={result['zoom']:.3f}, pan_x={result['pan_x']:.1f}, pan_y={result['pan_y']:.1f}, "
             f"vp={result['viewport']} | box={result['box']}"
@@ -759,33 +774,32 @@ if result is not None:
         if not per_model_results:
             st.error("No model produced a valid prediction.")
         else:
-            # ---- Ensemble summary (if compatible) ----
             ens = result.get("ensemble_summary")
             if ens is not None:
                 st.markdown("### Ensemble Summary")
                 st.write(f"**Average-score prediction:** `{ens['avg_pred_label']}` (class {ens['avg_pred_index']})")
                 st.write(f"**Majority vote:** `{ens['majority_vote_label']}` (class {ens['majority_vote_index']})")
-
                 vote_text = ", ".join([f"class_{k}: {v}" for k, v in ens["vote_counts"].items()])
                 st.caption(f"Votes → {vote_text}")
 
                 with st.expander("Average scores (ensemble)"):
                     for lbl, score in zip(ens["labels"], ens["avg_scores"]):
                         st.write(f"**{lbl}**: {float(score):.4f} ({float(score)*100:.2f}%)")
-                        try:
-                            st.progress(float(score))
-                        except Exception:
-                            pass
+                        if 0.0 <= float(score) <= 1.0:
+                            try:
+                                st.progress(float(score))
+                            except Exception:
+                                pass
             else:
                 st.info("Ensemble summary is unavailable (selected models have incompatible output dimensions).")
 
             st.markdown("### Per-model Details")
-
-            # summary table-like metrics
             for i, mr in enumerate(per_model_results, start=1):
                 pred_info = mr["pred_info"]
                 with st.expander(f"{i}. {mr['model_name']} → {pred_info['pred_label']}", expanded=(i == 1)):
                     st.write(f"**Prediction:** {pred_info['pred_label']} (class {pred_info['pred_index']})")
+                    st.write(f"**Input tensor shape:** `{mr['input_shape']}`")
+                    st.write(f"**Model path:** `{mr['model_path']}`")
 
                     for lbl, score in pred_info["display_pairs"]:
                         if 0.0 <= float(score) <= 1.0:
