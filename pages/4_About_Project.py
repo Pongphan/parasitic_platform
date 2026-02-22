@@ -222,9 +222,10 @@ st.markdown('<div class="section-label">Why this platform exists</div>', unsafe_
 st.write(
     """
     <div class="table-wrap">
-    Parasitic diseases remain a major public health challenge, especially in resource-limited settings where access to expert diagnosis, standardized learning materials, and research support tools is often limited. In many laboratories and educational environments, parasite identification still depends heavily on specialist experience, and this can lead to delays, inconsistency, and diagnostic errors.<br><br>
-    A web application that integrates a Parasitic Atlas, Parasitic Research Guide, and AI-based Detection can help bridge these gaps by providing a single digital platform for education, research, and preliminary diagnostic support. The Parasitic Atlas can serve as an accessible visual reference for parasite morphology, life cycle stages, and key diagnostic features. The Parasitic Research Guide can support students, researchers, and laboratory personnel with structured protocols, references, study design guidance, and updated methodologies. Meanwhile, AI detection tools can assist in screening microscopic images, improving efficiency, reducing workload, and supporting more standardized interpretations.<br><br>
-    This integrated platform is motivated by the need to combine knowledge accessibility, research capacity building, and intelligent diagnostic assistance into one practical system. By using a web-based approach, the platform can be accessed from different locations and devices, making it suitable for teaching institutions, research laboratories, and clinical settings. Ultimately, the goal is to strengthen parasitology education and research while advancing digital health innovation for faster, smarter, and more scalable parasite detection and analysis.<br><br>
+      <b>สำนักงานการวิจัยแห่งชาติ–สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ–มหาวิทยาลัยขอนแก่น</b><br>
+      <b>ทุนส่งเสริมกลุ่มวิจัยศักยภาพสูง ประจำปี 2567</b><br>
+      กลุ่มวิจัย: สร้างองค์ความรู้ใหม่ของโรคติดเชื้ออุบัติใหม่และอุบัติซ้ำ โรคติดเชื้อในเขตร้อนที่ถูกละเลยและโรคที่นำโดยพาหะแบบบูรณาการวิจัย<br>
+      เพื่อพัฒนาผลิตนวัตกรรมใหม่สู่การประยุกต์ใช้เชิงพาณิชย์และการพัฒนาทรัพยากรมนุษย์เพื่อสังคมไทยที่ยั่งยืน (สัญญาเลขที่ N42A670561)<br>
     </div>
     """, unsafe_allow_html=True)
 
