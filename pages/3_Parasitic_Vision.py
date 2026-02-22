@@ -14,7 +14,7 @@ from viewer_component import viewer_component
 # Page config
 # =========================
 st.set_page_config(
-    page_title="Image Classification",
+    page_title="Parasitic Vision",
     page_icon=":brain:",
     layout="wide",
     initial_sidebar_state="collapsed",
