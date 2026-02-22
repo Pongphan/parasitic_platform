@@ -624,8 +624,6 @@ if original_img is None:
     st.info("Upload an image or choose one from Dataset gallery.")
     st.stop()
 
-st.caption(f"Current image source → {source_label}")
-
 st.caption(
     "Tip: Zoom/pan to place the target object inside the center box, then click **Calculate**. "
     "The app will run all selected models on the same ROI."
@@ -798,8 +796,6 @@ if result is not None:
                 pred_info = mr["pred_info"]
                 with st.expander(f"{i}. {mr['model_name']} → {pred_info['pred_label']}", expanded=(i == 1)):
                     st.write(f"**Prediction:** {pred_info['pred_label']} (class {pred_info['pred_index']})")
-                    st.write(f"**Input tensor shape:** `{mr['input_shape']}`")
-                    st.write(f"**Model path:** `{mr['model_path']}`")
 
                     for lbl, score in pred_info["display_pairs"]:
                         if 0.0 <= float(score) <= 1.0:
