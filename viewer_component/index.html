@@ -1,0 +1,484 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <style>
+    body {
+      margin:0; padding:0; background:transparent;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+
+    .wrap {
+      position:relative;
+      user-select:none;
+    }
+
+    canvas {
+      border-radius:10px;
+      background:#0b1220;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      cursor:grab;
+      display:block;
+      touch-action: none;
+    }
+    canvas:active { cursor:grabbing; }
+
+    .hint {
+      position:absolute;
+      left:10px;
+      bottom:10px;
+      padding:6px 10px;
+      font-size:12px;
+      color:rgba(255,255,255,.85);
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      backdrop-filter:blur(6px);
+      pointer-events:none;
+    }
+
+    .btn {
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:600;
+      color:white;
+      background:rgba(56,189,248,.25);
+      border:1px solid rgba(56,189,248,.35);
+      border-radius:999px;
+      backdrop-filter:blur(6px);
+      cursor:pointer;
+      transition: background .12s ease, transform .06s ease;
+    }
+    .btn:hover { background:rgba(56,189,248,.32); }
+    .btn:active { transform: translateY(1px); }
+
+    .calc-btn {
+      position:absolute;
+      right:10px;
+      top:10px;
+      z-index:5;
+    }
+
+    /* Control panel (Pan + Zoom) */
+    .controls {
+      position:absolute;
+      right:10px;
+      bottom:10px;
+      z-index:5;
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      pointer-events:auto;
+    }
+
+    .ctrl-card {
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 8px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,.22);
+    }
+
+    .ctrl-title {
+      color: rgba(255,255,255,.86);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      margin: 0 0 6px 0;
+      text-align:center;
+    }
+
+    /* D-pad for pan */
+    .dpad {
+      display:grid;
+      grid-template-columns: 36px 36px 36px;
+      grid-template-rows: 36px 36px 36px;
+      gap:6px;
+      align-items:center;
+      justify-items:center;
+    }
+
+    .icon-btn {
+      width:36px;
+      height:36px;
+      padding:0;
+      border-radius:10px;
+      font-size:16px;
+      line-height:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(56,189,248,.20);
+      border:1px solid rgba(56,189,248,.32);
+      color:white;
+      cursor:pointer;
+    }
+    .icon-btn:hover { background: rgba(56,189,248,.28); }
+    .icon-btn:active { transform: translateY(1px); }
+
+    .icon-btn.center-dot {
+      cursor:default;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:rgba(255,255,255,.55);
+    }
+
+    .empty {
+      width:36px;
+      height:36px;
+    }
+
+    /* Zoom stack */
+    .zoom-stack {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:center;
+    }
+
+    .zoom-btn {
+      width:44px;
+      height:36px;
+      padding:0;
+      border-radius:10px;
+      font-size:18px;
+      font-weight:700;
+      line-height:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: rgba(56,189,248,.20);
+      border:1px solid rgba(56,189,248,.32);
+      color:white;
+      cursor:pointer;
+    }
+    .zoom-btn:hover { background: rgba(56,189,248,.28); }
+    .zoom-btn:active { transform: translateY(1px); }
+
+    .zoom-readout {
+      min-width:44px;
+      text-align:center;
+      font-size:11px;
+      color:rgba(255,255,255,.82);
+      font-weight:600;
+      margin-top:2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="cv"></canvas>
+
+    <div class="hint">Wheel = Zoom • Drag = Pan • Buttons = Move/Zoom</div>
+
+    <button id="calcBtn" class="btn calc-btn" type="button">Calculate</button>
+
+    <!-- New control buttons -->
+    <div class="controls">
+      <div class="ctrl-card">
+        <div class="ctrl-title">PAN</div>
+        <div class="dpad">
+          <div class="empty"></div>
+          <button id="panUpBtn" class="icon-btn" type="button" title="Pan up">▲</button>
+          <div class="empty"></div>
+
+          <button id="panLeftBtn" class="icon-btn" type="button" title="Pan left">◀</button>
+          <div class="icon-btn center-dot" title="Center guide">•</div>
+          <button id="panRightBtn" class="icon-btn" type="button" title="Pan right">▶</button>
+
+          <div class="empty"></div>
+          <button id="panDownBtn" class="icon-btn" type="button" title="Pan down">▼</button>
+          <div class="empty"></div>
+        </div>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">ZOOM</div>
+        <div class="zoom-stack">
+          <button id="zoomInBtn" class="zoom-btn" type="button" title="Zoom in">+</button>
+          <button id="zoomOutBtn" class="zoom-btn" type="button" title="Zoom out">−</button>
+          <div id="zoomReadout" class="zoom-readout">100%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---- minimal Streamlit component protocol (no React) ----
+  function sendMessage(type, data){
+    const out = Object.assign({ isStreamlitMessage:true, type:type }, data);
+    window.parent.postMessage(out, "*");
+  }
+  function componentReady(){ sendMessage("streamlit:componentReady", { apiVersion: 1 }); }
+  function setFrameHeight(h){ sendMessage("streamlit:setFrameHeight", { height:h }); }
+  function setComponentValue(obj){
+    // Send only on Calculate click to trigger exactly 1 rerun
+    sendMessage("streamlit:setComponentValue", { value: obj, dataType: "json" });
+  }
+
+  // Unique token generator: timestamp + random
+  function makeCalcToken(){
+    const ts = Date.now().toString(36);
+    const rnd = Math.random().toString(36).slice(2, 10);
+    return ts + "-" + rnd;
+  }
+
+  const canvas = document.getElementById("cv");
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+  const zoomReadout = document.getElementById("zoomReadout");
+
+  // Frontend-only state (NO sending during zoom/pan)
+  let vp = 600;
+  let zoom = 1.0, panX = 0.0, panY = 0.0;
+  let dragging = false, lastX = 0, lastY = 0;
+
+  // Control tuning
+  const ZOOM_MIN = 0.15;
+  const ZOOM_MAX = 12.0;
+  const ZOOM_IN_FACTOR = 1.10;
+  const ZOOM_OUT_FACTOR = 1.0 / ZOOM_IN_FACTOR; // ~0.909
+  const PAN_STEP_RATIO = 0.06; // 6% of viewport per click
+
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function updateZoomReadout(){
+    const pct = Math.round(zoom * 100);
+    zoomReadout.textContent = `${pct}%`;
+  }
+
+  function resizeCanvas(newVp){
+    vp = newVp;
+    canvas.width = vp;
+    canvas.height = vp;
+    canvas.style.width = vp + "px";
+    canvas.style.height = vp + "px";
+
+    const wrap = document.querySelector(".wrap");
+    wrap.style.width = vp + "px";
+    wrap.style.height = vp + "px";
+
+    // extra height to fit controls + hint comfortably
+    setFrameHeight(vp + 70);
+    updateZoomReadout();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,vp,vp);
+    ctx.fillStyle = "#0b1220";
+    ctx.fillRect(0,0,vp,vp);
+
+    if(!img.complete || !img.naturalWidth || !img.naturalHeight){
+      requestAnimationFrame(draw);
+      return;
+    }
+
+    const w0 = img.naturalWidth, h0 = img.naturalHeight;
+    const baseScale = Math.min(vp / w0, vp / h0);
+    const scale = baseScale * zoom;
+
+    const cx = vp/2, cy = vp/2;
+    const dw = w0 * scale, dh = h0 * scale;
+    const dx = cx - dw/2 + panX;
+    const dy = cy - dh/2 + panY;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(img, dx, dy, dw, dh);
+
+    // 3x3 grid
+    const step = vp/3;
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255, 120, 120, 0.55)";
+    for(let i=1;i<=2;i++){
+      const p = step*i;
+      ctx.beginPath(); ctx.moveTo(p,0); ctx.lineTo(p,vp); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,p); ctx.lineTo(vp,p); ctx.stroke();
+    }
+    ctx.restore();
+
+    // center cell overlay
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(120, 200, 255, 0.9)";
+    ctx.fillStyle = "rgba(120, 200, 255, 0.10)";
+    ctx.beginPath(); ctx.rect(step,step,step,step);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    requestAnimationFrame(draw);
+  }
+
+  // Keep point under cursor fixed while zooming (general utility)
+  function zoomAboutScreenPoint(mx, my, factor){
+    if(!img.complete || !img.naturalWidth || !img.naturalHeight) return;
+
+    const w0 = img.naturalWidth, h0 = img.naturalHeight;
+    const baseScale = Math.min(vp / w0, vp / h0);
+    const oldScale = baseScale * zoom;
+
+    const cx = vp/2, cy = vp/2;
+
+    // Screen -> image (before zoom)
+    const ix = (mx - cx - panX) / oldScale + (w0/2);
+    const iy = (my - cy - panY) / oldScale + (h0/2);
+
+    zoom = clamp(zoom * factor, ZOOM_MIN, ZOOM_MAX);
+
+    const newScale = baseScale * zoom;
+    // Recompute pan so the same image point stays under the same screen point
+    panX = mx - cx - (ix - (w0/2)) * newScale;
+    panY = my - cy - (iy - (h0/2)) * newScale;
+
+    updateZoomReadout();
+  }
+
+  function zoomAboutCenter(factor){
+    zoomAboutScreenPoint(vp/2, vp/2, factor);
+  }
+
+  function panBy(dx, dy){
+    panX += dx;
+    panY += dy;
+  }
+
+  function panStep(){
+    return Math.max(8, Math.round(vp * PAN_STEP_RATIO));
+  }
+
+  // Zoom about mouse position (NO sending)
+  function onWheel(e){
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const factor = (e.deltaY < 0) ? 1.08 : 0.92;
+    zoomAboutScreenPoint(mx, my, factor);
+  }
+
+  function onDown(e){
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+  }
+
+  function onMove(e){
+    if(!dragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    panX += dx;
+    panY += dy;
+  }
+
+  function onUp(){
+    dragging = false;
+  }
+
+  canvas.addEventListener("wheel", onWheel, { passive:false });
+  canvas.addEventListener("pointerdown", onDown);
+  canvas.addEventListener("pointermove", onMove);
+  canvas.addEventListener("pointerup", onUp);
+  canvas.addEventListener("pointercancel", onUp);
+  canvas.addEventListener("pointerleave", onUp);
+
+  // ---- Button controls (NEW) ----
+  document.getElementById("panLeftBtn").addEventListener("click", () => {
+    panBy(panStep(), 0); // move image right => target appears left under center guide
+  });
+
+  document.getElementById("panRightBtn").addEventListener("click", () => {
+    panBy(-panStep(), 0); // move image left => target appears right
+  });
+
+  document.getElementById("panUpBtn").addEventListener("click", () => {
+    panBy(0, panStep()); // move image down => target appears up
+  });
+
+  document.getElementById("panDownBtn").addEventListener("click", () => {
+    panBy(0, -panStep()); // move image up => target appears down
+  });
+
+  document.getElementById("zoomInBtn").addEventListener("click", () => {
+    zoomAboutCenter(ZOOM_IN_FACTOR);
+  });
+
+  document.getElementById("zoomOutBtn").addEventListener("click", () => {
+    zoomAboutCenter(ZOOM_OUT_FACTOR);
+  });
+
+  // Optional keyboard shortcuts when component focused/active
+  window.addEventListener("keydown", (e) => {
+    // avoid hijacking typing if future inputs exist
+    const tag = (document.activeElement && document.activeElement.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea") return;
+
+    const step = panStep();
+
+    switch (e.key) {
+      case "ArrowLeft":
+        e.preventDefault(); panBy(step, 0); break;
+      case "ArrowRight":
+        e.preventDefault(); panBy(-step, 0); break;
+      case "ArrowUp":
+        e.preventDefault(); panBy(0, step); break;
+      case "ArrowDown":
+        e.preventDefault(); panBy(0, -step); break;
+      case "+":
+      case "=":
+        e.preventDefault(); zoomAboutCenter(ZOOM_IN_FACTOR); break;
+      case "-":
+      case "_":
+        e.preventDefault(); zoomAboutCenter(ZOOM_OUT_FACTOR); break;
+      default:
+        break;
+    }
+  });
+
+  // Calculate button: SEND ONCE -> triggers exactly 1 rerun
+  document.getElementById("calcBtn").addEventListener("click", () => {
+    const token = makeCalcToken();
+    setComponentValue({
+      action: "calculate",
+      calc_token: token,
+      zoom: zoom,
+      panX: panX,
+      panY: panY,
+      viewport: vp
+    });
+  });
+
+  // Receive args from Python (render)
+  function onRender(event){
+    if(event.data.type !== "streamlit:render") return;
+    const args = event.data.args || {};
+
+    const newVp = Number(args.viewport || 600);
+    if(newVp !== vp) resizeCanvas(newVp);
+
+    // init from Python only (first load or python reset)
+    zoom = Number(args.init_zoom ?? zoom);
+    panX = Number(args.init_panX ?? panX);
+    panY = Number(args.init_panY ?? panY);
+    updateZoomReadout();
+
+    const b64 = args.image_b64 || "";
+    img.src = "data:image/png;base64," + b64;
+  }
+
+  window.addEventListener("message", onRender);
+
+  // init
+  componentReady();
+  resizeCanvas(600);
+  updateZoomReadout();
+  requestAnimationFrame(draw);
+</script>
+</body>
+</html>
