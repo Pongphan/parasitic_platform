@@ -1,4 +1,4 @@
-# Parasitic Platform (Streamlit)
+# Parasitic Platform
 
 A modular, expert-grade Streamlit web application for **parasitology education**, **research planning**, and **AI-assisted microscopy** using **TensorFlow SavedModel / .keras**.
 
