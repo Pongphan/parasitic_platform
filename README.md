@@ -39,3 +39,23 @@ A modular, expert-grade Streamlit web application for **parasitology education**
 
 ### 5) About Project
 - Vision, scope, architecture, QA & governance, roadmap, FAQ.
+
+Phase 1 — A Parasitic Platform Project (Complete)
+• ปรับโครงสร้างของ web applications
+• เพิ่มโมดูล parasite atlas
+• เพิ่มโมดูล parasite research
+• ปรับโครงสร้างของการทำงานในหน้า parasite detection
+• เพิ่ม roadmap ในส่วนของ about
+
+Phase 2 — Atlas and Advancd AI (Current)
+• แก้ bug ของ web applications
+• เพิ่มเนื้อหาในส่วน parasite atlas ฉบับสมบูรณ์
+• เพิ่มความแม่นยำของโมเดลในหน้า parasite detection
+• ปรับรูปแบบการรายงานผล
+
+
+Phase 3 — Research Level
+• แก้ bug ของ web application
+• พัฒนาเนื้อหาในส่วนของ parasite research ให้สมบูรณ์
+• เพิ่มโมดูล การค้นหางานวิจัยจากฐานข้อมูลเปิด และการทำ meta-analysis
+• deploy ใน stable server
