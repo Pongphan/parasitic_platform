@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "models": {
+    "img_classified_dataset1_cnn.keras": {
+      "sha256": "c556b29e43166407d619e5f071db96b62e77a16dacfbfc91d90a843f5b588ff2",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-16@21:34:11",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    },
+    "img_classified_dataset1_paca.keras": {
+      "sha256": "ff1b2ee85247bdd7d98f84bb1a8a08a2157bcdee0ccb3768a4238657c1ebf9ff",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-16@21:05:19",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    },
+    "img_classified_dataset2_cnn.keras": {
+      "sha256": "2e03219bb0b70f2ec2bf92957a10a553d69743e9810f8678fca4e1298203201d",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-17@00:10:35",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    },
+    "img_classified_dataset2_paca.keras": {
+      "sha256": "3766634c50073aee3043750cd3e0382e48b7b3c9140955417b4984fdade10f91",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-16@23:41:40",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    },
+    "img_classified_transf12_cnn.keras": {
+      "sha256": "9eef8af3b77b46fc91b7dbd60b5d3624951d93b35605f7119580428ad11e4ba6",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-16@22:55:26",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    },
+    "img_classified_transf12_paca.keras": {
+      "sha256": "990c484b1149280cedb4afb1ffe71c08ed843db42c29da2d2b128fccf294b5fd",
+      "labels": [
+        "artifact",
+        "opisthorchis viverrini egg",
+        "minute intestinal fluke egg"
+      ],
+      "preprocessing": "raw_0_255",
+      "input_shape": [
+        null,
+        128,
+        128,
+        3
+      ],
+      "input_dtype": "float32",
+      "output_activation": "sigmoid",
+      "output_classes": 3,
+      "keras_version_saved": "3.13.2",
+      "date_saved": "2026-11-16@22:26:58",
+      "verification": "legacy_unverified",
+      "labels_verified": false,
+      "preprocessing_verified": false,
+      "validation_dataset": null,
+      "reviewer": null,
+      "review_date": null,
+      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
+    }
+  }
+}

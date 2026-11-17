@@ -1,7 +1,5 @@
 # pages/4_About_Project.py
 import streamlit as st
-from dataclasses import dataclass
-from typing import List, Dict
 
 st.set_page_config(
     page_title="About Project",
@@ -264,7 +262,7 @@ with n2:
 with n3:
     st.page_link("pages/2_Parasitology_Research.py", label="Parasitology Research", icon="📚")
 with n4:
-    st.page_link("pages/3_Parasitic_Vision.py", label="Parasitic Vision", icon="🧠")
+    st.page_link("pages/3_ParD_-_Parasite_Detection.py", label="ParD - Parasite Detection", icon="🧠")
 
 st.markdown(
     "<div style='margin-top:16px; color:rgba(234,241,255,.45); font-size:.86rem;'>"

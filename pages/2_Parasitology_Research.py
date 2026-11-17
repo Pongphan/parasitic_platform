@@ -1,7 +1,8 @@
 # pages/2_Parasitology_Research.py
 import streamlit as st
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from html import escape
+from typing import List
 
 st.set_page_config(
     page_title="Parasitology Research",
@@ -602,7 +603,7 @@ with st.sidebar:
     st.caption("Navigation")
     st.page_link("app.py", label="Home", icon="🏠")
     st.page_link("pages/1_Human_Parasite.py", label="Human Parasite", icon="🧬")
-    st.page_link("pages/3_Parasitic_Vision.py", label="Parasitic Vision", icon="🧠")
+    st.page_link("pages/3_ParD_-_Parasite_Detection.py", label="ParD - Parasite Detection", icon="🧠")
     st.page_link("pages/4_About_Project.py", label="About Project", icon="ℹ️")
 
 
@@ -685,7 +686,7 @@ if compare_names:
             }
         )
     st.markdown('<div class="section-label">Comparison snapshot</div>', unsafe_allow_html=True)
-    st.dataframe(rows, use_container_width=True, hide_index=True)
+    st.dataframe(rows, width="stretch", hide_index=True)
 
 # -------------------- Main Layout --------------------
 left, right = st.columns([1.7, 1], gap="small")
@@ -822,11 +823,19 @@ with right:
 
     st.write("")
 
-    organism = st.selectbox(
+    organism_choice = st.selectbox(
         "Target organism / condition",
         ["Soil-transmitted helminths (STH)", "Opisthorchis/Clonorchis (liver flukes)", "Malaria", "Giardia/Cryptosporidium", "Schistosomiasis", "Other (custom)"],
         index=0,
+        key="research_organism",
     )
+    organism = organism_choice
+    if organism_choice == "Other (custom)":
+        organism = st.text_input(
+            "Custom organism / condition",
+            key="research_custom_organism",
+            placeholder="Enter the organism or condition",
+        ).strip()
     setting = st.selectbox(
         "Setting",
         ["School-based survey", "Community household survey", "Hospital/clinic diagnostics", "Vector field surveillance", "Laboratory assay development", "Multi-site program evaluation"],
@@ -848,14 +857,21 @@ with right:
         index=0,
     )
 
-    st.write("")
-    if st.button("Generate blueprint", use_container_width=True):
-        st.markdown('<div class="section-label">Blueprint</div>', unsafe_allow_html=True)
+    builder_inputs = {
+        "branch": branch.name,
+        "organism": organism,
+        "setting": setting,
+        "design": design,
+        "primary_endpoint": primary_endpoint,
+        "sample_size_approach": sample_size_style,
+    }
 
+    st.write("")
+    if st.button("Generate blueprint", width="stretch", disabled=not organism):
         blueprint = f"""
 <div class="table-wrap">
 <b>Project title (template)</b><br>
-{branch.name}: A {design.lower()} focused on <span class="mono">{organism}</span> in a <span class="mono">{setting}</span> context.<br><br>
+{branch.name}: A {design.lower()} focused on <span class="mono">{escape(organism)}</span> in a <span class="mono">{setting}</span> context.<br><br>
 
 <b>1) Background & gap</b><br>
 • Summarize local burden and why current approaches are insufficient.<br>
@@ -890,7 +906,31 @@ with right:
 • Consent, confidentiality, biosafety, and data sharing plan (de-identified).<br>
 </div>
 """
-        st.markdown(blueprint, unsafe_allow_html=True)
+        st.session_state.research_blueprint = {
+            "html": blueprint,
+            "inputs": builder_inputs,
+        }
+
+    saved_blueprint = st.session_state.get("research_blueprint")
+    if saved_blueprint:
+        st.markdown('<div class="section-label">Blueprint</div>', unsafe_allow_html=True)
+        if saved_blueprint["inputs"] != builder_inputs:
+            st.info("Inputs have changed. Generate a new blueprint to update this saved draft.")
+        st.markdown(saved_blueprint["html"], unsafe_allow_html=True)
+        document = (
+            '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            '<title>Research blueprint</title>'
+            '<style>body{font-family:Arial,sans-serif;line-height:1.6;'
+            'max-width:900px;margin:32px auto;padding:0 24px}</style>'
+            '</head><body>' + saved_blueprint["html"] + '</body></html>'
+        )
+        st.download_button(
+            "Download blueprint",
+            data=document,
+            file_name="research_blueprint.html",
+            mime="text/html",
+            on_click="ignore",
+        )
 
     st.write("")
     st.markdown(
@@ -934,7 +974,7 @@ with right:
     )
     st.page_link("app.py", label="Home", icon="🏠")
     st.page_link("pages/1_Human_Parasite.py", label="Human Parasite", icon="🧬")
-    st.page_link("pages/3_Parasitic_Vision.py", label="Parasitic Vision", icon="🧠")
+    st.page_link("pages/3_ParD_-_Parasite_Detection.py", label="ParD - Parasite Detection", icon="🧠")
     st.page_link("pages/4_About_Project.py", label="About Project", icon="ℹ️")
 
 # -------------------- Footer --------------------
