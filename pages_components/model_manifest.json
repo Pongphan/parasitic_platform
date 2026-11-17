@@ -135,33 +135,6 @@
       "reviewer": null,
       "review_date": null,
       "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
-    },
-    "img_classified_transf12_paca.keras": {
-      "sha256": "990c484b1149280cedb4afb1ffe71c08ed843db42c29da2d2b128fccf294b5fd",
-      "labels": [
-        "artifact",
-        "opisthorchis viverrini egg",
-        "minute intestinal fluke egg"
-      ],
-      "preprocessing": "raw_0_255",
-      "input_shape": [
-        null,
-        128,
-        128,
-        3
-      ],
-      "input_dtype": "float32",
-      "output_activation": "sigmoid",
-      "output_classes": 3,
-      "keras_version_saved": "3.13.2",
-      "date_saved": "2026-11-16@22:26:58",
-      "verification": "legacy_unverified",
-      "labels_verified": false,
-      "preprocessing_verified": false,
-      "validation_dataset": null,
-      "reviewer": null,
-      "review_date": null,
-      "provenance": "Labels and raw 0-255 preprocessing preserve the previous application defaults. Training class order and preprocessing have not been independently verified. Shape, activation, save metadata and SHA-256 were extracted from this model file."
     }
   }
 }

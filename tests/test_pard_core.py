@@ -118,7 +118,9 @@ def test_manifest_is_bound_to_model_content(tmp_path):
 def test_all_bundled_models_have_truthful_content_bound_specs():
     models_dir = Path(__file__).resolve().parents[1] / "pages_components"
     paths = discover_models(models_dir)
-    assert len(paths) == 6
+    assert len(paths) == 5
+    manifest = json.loads((models_dir / "model_manifest.json").read_text(encoding="utf-8"))
+    assert set(manifest["models"]) == {path.name for path in paths}
     for path in paths:
         spec = load_model_spec(path)
         assert spec["input_shape"] == [None, 128, 128, 3]

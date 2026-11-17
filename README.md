@@ -19,7 +19,7 @@ python -m venv .venv
 - **Home:** searchable navigation to the four workspaces.
 - **Human Parasite:** 14 profiles, keyword search, canonical syndrome filters, comparisons, and an educational candidate helper.
 - **Parasitology Research:** nine research branches and a project blueprint builder. Custom organisms are supported; generated drafts stay available during the session and can be downloaded as HTML. Changed inputs are identified without overwriting the saved draft.
-- **ParD - Parasite Detection:** upload an image or explicitly select a dataset sample, zoom/pan to frame the center ROI, run selected classifiers, and compare model scores. The default viewport is **900 pixels**, all six bundled models are selected, and per-model details start collapsed. The interface uses pastel backgrounds and larger text; the canvas scales to smaller screens while retaining consistent crop coordinates.
+- **ParD - Parasite Detection:** upload an image or explicitly select a dataset sample, zoom/pan to frame the center ROI, run selected classifiers, and compare model scores. The default viewport is **900 pixels**, all five bundled models are selected, and per-model details start collapsed. The interface uses pastel backgrounds and larger text; the canvas scales to smaller screens while retaining consistent crop coordinates.
 - **About Project:** project context and roadmap.
 
 ParD currently performs **classification of a manually selected ROI**. It does not automatically locate all objects, perform tiled object detection, or produce YOLO bounding-box labels. Its exports are the ROI PNG, model-score CSV, and JSON result with image/model digests, ROI coordinates, preprocessing, errors, and calculation time.
@@ -28,7 +28,7 @@ ParD currently performs **classification of a manually selected ROI**. It does n
 
 Models live in `pages_components/`; `model_manifest.json` binds each file to a SHA-256 digest, ordered labels, input shape, and preprocessing. Models are loaded lazily and cached by their content digest. Supported formats are `.keras`, `.h5`/`.hdf5`, and SavedModel classification signatures with one NHWC RGB image input and one classification output. Detection/multiple-output signatures are rejected.
 
-The six bundled manifests preserve the previous application's class order and raw 0-255 preprocessing. These assumptions are explicitly **`legacy_unverified`**: the training class map, preprocessing specification, and labeled evaluation dataset have not been supplied. The app must not be described as clinically validated, and displayed scores are not calibrated diagnostic probabilities.
+The five bundled manifests preserve the previous application's class order and raw 0-255 preprocessing. These assumptions are explicitly **`legacy_unverified`**: the training class map, preprocessing specification, and labeled evaluation dataset have not been supplied. The app must not be described as clinically validated, and displayed scores are not calibrated diagnostic probabilities.
 
 To add or replace a model:
 

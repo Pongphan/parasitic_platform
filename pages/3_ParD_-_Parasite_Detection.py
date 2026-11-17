@@ -108,6 +108,11 @@ with controls[1]:
 
 available_paths = discover_models(MODELS_DIR)
 model_paths = {path_display_name(path): path for path in available_paths}
+if "pard_models" in st.session_state:
+    previous_selection = st.session_state.pard_models
+    available_selection = [name for name in previous_selection if name in model_paths]
+    if available_selection != previous_selection:
+        st.session_state.pard_models = available_selection
 selected_names = st.multiselect(
     "Select model(s)", options=list(model_paths), default=list(model_paths), key="pard_models",
 )

@@ -60,23 +60,32 @@ def calculate(app, state, token="first", **coordinates):
 def test_defaults_calculate_collapsed_details_and_result_invalidation(inference):
     app = page()
     assert app.slider(key="pard_viewport").value == 900
-    assert len(app.multiselect(key="pard_models").value) == 6
+    assert len(app.multiselect(key="pard_models").value) == 5
     app.button(key="pard_use_dataset").click().run()
     assert not app.exception
     calculate(app, inference)
-    assert len(inference["calls"]) == 6
+    assert len(inference["calls"]) == 5
     details = [e for e in app.expander if ". img_classified" in e.label]
-    assert len(details) == 6
+    assert len(details) == 5
     assert all(not e.proto.expanded for e in details)
     assert len(app.get("download_button")) == 3
     app.run()
-    assert len(inference["calls"]) == 6  # No repeated inference on a rerun.
+    assert len(inference["calls"]) == 5  # No repeated inference on a rerun.
     calculate(app, inference, token="second", zoom=2)
-    assert len(inference["calls"]) == 12
+    assert len(inference["calls"]) == 10
     app.checkbox(key="pard_normalize").check().run()
     assert not app.exception
     assert app.session_state.pard_result is None
-    assert len(inference["calls"]) == 12
+    assert len(inference["calls"]) == 10
+
+
+def test_model_selection_drops_removed_models_from_existing_session(inference):
+    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run()
+    available = [path.name for path in pard_core.discover_models(ROOT / "pages_components")]
+    app.session_state.pard_models = available + ["retired_model.keras"]
+    app.switch_page(PAGE).run()
+    assert not app.exception
+    assert app.multiselect(key="pard_models").value == available
 
 
 def test_empty_roi_never_calls_models(inference):
