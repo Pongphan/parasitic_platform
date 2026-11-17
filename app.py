@@ -90,7 +90,7 @@ header { visibility: hidden; }
 }
 
 [data-testid="stMetricLabel"] p, .section-label, .small-muted {
-    color: #E2E8F0 !important; 
+    color: #E2E8F0 !important;
 }
 
 [data-testid="stMetricValue"] div, .card-title, .hero h1 {
@@ -114,7 +114,7 @@ header { visibility: hidden; }
 
 [data-testid="stPageLink-NavLink"]:hover {
     background-color: rgba(255, 255, 255, 0.1) !important;
-    border-color: #58C4FF !important; 
+    border-color: #58C4FF !important;
 }
 
 .pill {
@@ -301,11 +301,11 @@ modules = [
         "tags": ["research", "methods", "evidence"],
     },
     {
-        "route": "Parasitic_Vision",
+        "route": "ParD_-_Parasite_Detection",
         "icon": "🧠",
-        "title": "Parasitic Vision",
-        "desc": "Computer vision zone for microscopy detection, annotation, and QA.",
-        "pills": ["Detection", "Annotation", "QC", "Deployment"],
+        "title": "ParD - Parasite Detection",
+        "desc": "Frame microscopy objects, compare model scores, and export traceable results.",
+        "pills": ["ROI", "Classification", "Ensemble", "Reports"],
         "tags": ["vision", "ai", "microscopy"],
     },
     {
@@ -358,7 +358,7 @@ with u1:
 with u2:
     st.selectbox("Mode", ["Explore", "Research", "Lab Ops"], index=0, label_visibility="collapsed")
 with u3:
-    st.button("Refresh", use_container_width=True)
+    st.button("Refresh", width="stretch")
 st.markdown("</div>", unsafe_allow_html=True)
 
 # -------------------- KPI Row (metrics) --------------------
