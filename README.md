@@ -71,3 +71,6 @@ node tests/test_viewer.js
 ```
 
 The Python suite covers Atlas search/filter regressions, persistent research drafts, crop/output validation, model manifests, SavedModel loading, and ParD state/UI behavior. The SavedModel roundtrip uses TensorFlow when available. The Node tests exercise the real viewer script for rerenders, new images, responsive coordinates, and calculation events. A passing smoke check establishes execution, not predictive accuracy.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
